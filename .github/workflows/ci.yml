@@ -22,3 +22,6 @@ jobs:
 
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit
+
+      - name: Run app
+        run: php index.php

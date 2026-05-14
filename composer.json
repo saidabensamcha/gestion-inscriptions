@@ -1,0 +1,15 @@
+{
+    "name": "useradm/gestion-inscriptions-clean",
+    "description": "CI/CD PHP project for student registration system",
+    "type": "project",
+    "require-dev": {
+        "phpunit/phpunit": "^12.5"
+    },
+    "authors": [
+        {
+            "name": "saidabensamcha",
+            "email": "saidabensamcha@gmail.com"
+        }
+    ],
+    "require": {}
+}
