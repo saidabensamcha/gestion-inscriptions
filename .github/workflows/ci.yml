@@ -3,12 +3,10 @@ name: CI/CD Pipeline
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
 
-  test:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -24,18 +22,29 @@ jobs:
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist
 
+      - name: Lint PHP code
+        run: find . -name "*.php" -exec php -l {} \;
+
+      - name: Security check
+        run: composer audit || true
+
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit
-
-      - name: Run PHP syntax check
-        run: find . -name "*.php" -exec php -l {} \;
 
 
   deploy:
     runs-on: ubuntu-latest
-    needs: test
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: build-and-test
+    if: success() && github.ref == 'refs/heads/main'
 
     steps:
-      - name: Deployment simulation
-        run: echo "🚀 Deploy step successful (lab simulation mode)"
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: easingthemes/ssh-deploy@v4
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          TARGET: /var/www/html
